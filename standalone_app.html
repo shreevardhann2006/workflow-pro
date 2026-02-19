@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkflowPro - Premium Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* --- 1. DESIGN SYSTEM (Premium Dark Glass) --- */
+        :root {
+            /* Colors */
+            --bg-body: #020617;
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --primary: #8b5cf6;
+            /* Violet */
+            --primary-glow: rgba(139, 92, 246, 0.5);
+            --accent: #06b6d4;
+            /* Cyan */
+            --accent-glow: rgba(6, 182, 212, 0.5);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+
+            /* Glass Surface */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+            /* Text */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dark: #020617;
+            /* For light badges */
+
+            /* Gradients */
+            --grad-body-1: rgba(139, 92, 246, 0.15);
+            --grad-body-2: rgba(6, 182, 212, 0.15);
+
+            /* Dimensions */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --sidebar-width: 280px;
+        }
+
+        /* --- LIGHT THEME OVERRIDES (Premium) --- */
+        [data-theme="light"] {
+            /* Background: More attractive, subtle pastel mesh base */
+            --bg-body: #f8fafc;
+
+            /* Card: White with higher opacity for contrast against colorful bg */
+            --bg-card: rgba(255, 255, 255, 0.9);
+
+            /* Primary: Stronger Indigo */
+            --primary: #4338ca;
+            /* Indigo-700 */
+            --primary-glow: rgba(67, 56, 202, 0.3);
+
+            /* Accent: Vivid Cyan */
+            --accent: #0891b2;
+            /* Cyan-600 */
+            --accent-glow: rgba(8, 145, 178, 0.3);
+
+            /* Glass: Clearer, more crystalline */
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-highlight: rgba(255, 255, 255, 0.8);
+
+            /* Shadows: Deep, soft shadows for pop */
+            --glass-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                0 10px 15px -3px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+
+            /* Text: Very Dark Blue-Grey for maximum readability */
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            /* Slate-600 */
+            --text-dark: #ffffff;
+
+            /* Gradients: Vibrant and Attractive (Purple/Blue/Pink mash) */
+            --grad-body-1: rgba(167, 139, 250, 0.25);
+            /* Violet */
+            --grad-body-2: rgba(34, 211, 238, 0.25);
+            /* Cyan */
+
+            /* Status Colors */
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            background-image:
+                radial-gradient(circle at 15% 50%, var(--grad-body-1) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, var(--grad-body-2) 0%, transparent 25%);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- 2. UTILITIES & ANIMATIONS --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Light Mode Gradient Override */
+        [data-theme="light"] .text-gradient {
+            background-image: linear-gradient(135deg, #4338ca, #0891b2);
+            /* Darker Indigo to Cyan */
+            -webkit-background-clip: text;
+            background-clip: text;
+            filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.5));
+            /* Pop off background */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* --- 3. LOGIN SCREEN --- */
+        #login-screen,
+        #signup-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg-body);
+            transition: background 0.3s;
+            background-image:
+                radial-gradient(circle at 50% 50%, var(--grad-body-1) 0%, transparent 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            width: 420px;
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Glossy effect line */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: skewX(-25deg);
+            pointer-events: none;
+        }
+
+        .login-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 14px 16px;
+            margin: 10px 0;
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .login-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+            background: var(--glass-highlight);
+        }
+
+        /* --- 4. SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .brand {
+            padding: 2rem;
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            margin: 4px 16px;
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: var(--glass-highlight);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .user-profile-mini {
+            margin: 0 16px 2rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: var(--glass-highlight);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* --- 5. MAIN LAYOUT --- */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            height: 80px;
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .content {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        /* --- 6. CARDS & WIDGETS --- */
+        .card {
+            padding: 1.8rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hero Card Special */
+        .card-hero {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- 7. TABLES --- */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        td {
+            background: rgba(30, 41, 59, 0.4);
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        tr td:first-child {
+            border-left: 1px solid var(--glass-border);
+            border-radius: 12px 0 0 12px;
+        }
+
+        tr td:last-child {
+            border-right: 1px solid var(--glass-border);
+            border-radius: 0 12px 12px 0;
+        }
+
+        tr:hover td {
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        /* Light Mode Table Override */
+        [data-theme="light"] td {
+            background: rgba(255, 255, 255, 0.4);
+            border-bottom-color: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="light"] tr:hover td {
+            background: rgba(239, 246, 255, 0.6);
+            /* Very faint blue tint on hover */
+        }
+
+        /* --- 8. BADGES --- */
+        .badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .badge-admin {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .badge-member {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* Light Mode Badge Text Fixes */
+        [data-theme="light"] .badge-admin {
+            color: #5b21b6;
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        [data-theme="light"] .badge-member {
+            color: #047857;
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        [data-theme="light"] .badge-success {
+            color: #047857;
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        [data-theme="light"] .badge-warning {
+            color: #b45309;
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        [data-theme="light"] .badge {
+            font-weight: 600;
+        }
+
+        /* --- 9. MODALS --- */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: var(--bg-body);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            color: var(--text-main);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            outline: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Util */
+        .hidden {
+            display: none !important;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 class="text-gradient" style="margin-bottom: 0.5rem; font-size: 2.5rem;">Welcome Back</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Workflow & Target Management</p>
+
+            <form onsubmit="handleLogin(event)">
+                <input type="text" id="login-user" class="login-input" placeholder="Email Address" required>
+                <input type="password" id="login-pass" class="login-input" placeholder="Password" required>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1.5rem;">
+                    Sign In to Dashboard
+                </button>
+            </form>
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <span>Don't have an account? <a href="#" onclick="showSignup()"
+                            style="color: var(--primary); text-decoration: none; font-weight: 600;">Create
+                            one</a></span>
+                    <a href="#" onclick="forgotPassword()" style="color: var(--text-muted); font-size: 0.8rem;">Forgot
+                        Password?</a>
+                </div>
+                <button class="btn-outline" onclick="seedDemoUser()"
+                    style="width:100%; font-size:0.8rem; padding:4px 8px;">✨ Create Demo Admin (SHREEVARDHANN
+                    A)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1.5 SIGN UP SCREEN -->
+    <div id="signup-screen" class="hidden">
+        <div class="login-card">
+            <h1 class="text-gradient" style="margin-bottom: 0.5rem; font-size: 2.5rem;">Create Account</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Join WorkflowPro</p>
+
+            <form onsubmit="handleSignup(event)">
+                <input type="text" id="signup-name" class="login-input" placeholder="Full Name" required>
+                <input type="email" id="signup-email" class="login-input" placeholder="Email Address" required>
+                <input type="password" id="signup-pass" class="login-input" placeholder="Create Password" required>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1.5rem;">
+                    Sign Up & Login
+                </button>
+            </form>
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                Already have an account? <a href="#" onclick="showLogin()"
+                    style="color: var(--primary); text-decoration: none; font-weight: 600;">Log In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. APP INTERFACE -->
+    <div id="app-interface" class="hidden" style="display: flex; width: 100%; height: 100%;">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <span style="font-size: 1.8rem;">🚀</span>
+                <span class="text-gradient">WorkflowPro</span>
+            </div>
+
+            <div class="user-profile-mini">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                    <span id="display-role" class="badge badge-admin">Admin</span>
+                    <button id="theme-toggle" class="btn-outline" style="padding: 4px; border: none;"
+                        onclick="toggleTheme()">
+                        ☀️
+                    </button>
+                </div>
+                <div id="display-name" style="font-weight: 700; font-size: 1.1rem; margin-bottom: 2px;">User</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Logged in securely</div>
+            </div>
+
+            <nav id="nav-container" style="flex: 1; overflow-y: auto; padding-top: 10px;">
+                <!-- Injected via JS -->
+            </nav>
+
+            <div style="padding: 1.5rem; border-top: 1px solid var(--glass-border);">
+                <button onclick="logout()" class="btn-outline"
+                    style="width: 100%; padding: 12px; justify-content: center;">
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <h2 id="page-title" style="font-size: 1.5rem; font-weight: 700;">Dashboard</h2>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="width: 10px; height: 10px; background: #10b981; border-radius: 50%;"></span>
+                    <span style="font-size: 0.9rem; font-weight: 500;">System Online</span>
+                </div>
+            </header>
+
+            <div id="main-content" class="content">
+                <!-- Dynamic Content -->
+            </div>
+        </main>
+
+    </div>
+
+    <!-- 3. UNIVERSAL MODAL -->
+    <div id="input-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title" style="margin-bottom: 1.5rem;">Edit Item</h2>
+            <form id="modal-form" onsubmit="handleModalSubmit(event)">
+                <div id="modal-fields">
+                    <!-- Dynamic Fields -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-outline" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- SUPABASE CONFIG ---
+        const SUPABASE_URL = 'https://jtifdrvdccgatpllkkea.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWZkcnZkY2NnYXRwbGxra2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MTMxNjcsImV4cCI6MjA4Njk4OTE2N30.Ui_-DB_OtrnAobCEqoRLz8vkUaHFq-15TVmG9kx5Mts';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- STATE ---
+        let DB = {
+            users: [],
+            tasks: [],
+            projects: [],
+            goals: [],
+            activities: [],
+            weeklyStats: [40, 60, 30, 80, 50, 75, 90]
+        };
+
+        let currentUser = null;
+        let currentView = 'dashboard';
+        let showPasswords = false;
+        let currentEditingId = null;
+        let currentModalType = null;
+
+        // --- THEME & SESSION LOGIC ---
+        async function initApp() {
+            // 1. Theme Check
+            const savedTheme = localStorage.getItem('workflowPPS_Theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            // 2. Supabase Auth Check
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            if (session) {
+                await handleSession(session);
+            }
+
+            // Listen for auth changes
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    await handleSession(session);
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    DB = { users: [], tasks: [], projects: [], goals: [], activities: [], weeklyStats: [40, 60, 30, 80, 50, 75, 90] };
+                    document.getElementById('app-interface').classList.add('hidden');
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('login-screen').style.display = 'flex';
+                }
+            });
+        }
+
+        async function handleSession(session) {
+            currentUser = {
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+                role: session.user.user_metadata.role || 'Member'
+            };
+            await fetchData();
+            enterApp(true);
+        }
+
+        async function fetchData() {
+            try {
+                // Parallel fetching for performance
+                const [tasks, projects, goals, activities, profiles] = await Promise.all([
+                    supabaseClient.from('tasks').select('*').order('created_at', { ascending: false }),
+                    supabaseClient.from('projects').select('*'),
+                    supabaseClient.from('goals').select('*'),
+                    supabaseClient.from('activities').select('*').order('created_at', { ascending: false }).limit(20),
+                    supabaseClient.from('profiles').select('*')
+                ]);
+
+                if (tasks.error || projects.error || goals.error || activities.error || profiles.error) {
+                    const errors = [tasks.error, projects.error, goals.error, activities.error, profiles.error].filter(e => e);
+                    const notFoundError = errors.find(e => e.code === '404' || e.code === '42P01' || e.message.includes('relation') || e.message.includes('does not exist'));
+                    if (notFoundError) {
+                        showSetupModal();
+                        return; // Stop further processing
+                    }
+                    console.error("Supabase data fetch errors:", errors);
+                }
+
+                if (tasks.data) DB.tasks = tasks.data;
+                if (projects.data) DB.projects = projects.data;
+                if (goals.data) DB.goals = goals.data;
+                if (activities.data) DB.activities = activities.data;
+
+                // Map profiles to users for Team View
+                if (profiles.data) {
+                    DB.users = profiles.data.map(p => ({
+                        id: p.id,
+                        name: p.full_name || p.email,
+                        username: p.email,
+                        role: p.role || 'Member',
+                        password: '***'
+                    }));
+                }
+
+                renderView(currentView);
+            } catch (e) {
+                console.error("Error fetching data:", e);
+                // Check for missing table error (unhandled exceptions)
+                if (e.message && (e.message.includes('relation') || e.message.includes('does not exist') || e.code === '42P01' || e.message.includes('schema'))) {
+                    showSetupModal();
+                }
+            }
+
+            // SELF-HEALING: Check if current user has a profile. If not, create one.
+            const userProfile = DB.users.find(u => u.id === currentUser.id);
+            if (!userProfile) {
+                console.log("Self-healing: Profile missing for logged-in user. Recreating...");
+                const { error: healError } = await supabaseClient.from('profiles').insert({
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    full_name: currentUser.name,
+                    role: currentUser.role
+                });
+                if (!healError) {
+                    // Add to local state immediately
+                    DB.users.push({
+                        id: currentUser.id,
+                        name: currentUser.name,
+                        username: currentUser.email,
+                        role: currentUser.role,
+                        password: '***'
+                    });
+                    console.log("Self-healing: Profile restored.");
+                } else {
+                    console.error("Self-healing failed:", healError);
+                }
+            }
+        }
+
+        function showSetupModal() {
+            const setupSQL = `
+-- COPY AND RUN THIS IN SUPABASE SQL EDITOR
+create table if not exists public.profiles (
+  id uuid references auth.users(id) on delete cascade not null primary key,
+  email text, full_name text, role text default 'Member'
+);
+create table if not exists public.tasks (
+  id bigint generated by default as identity primary key,
+  title text not null, assignee text, status text default 'Pending',
+  deadline date, type text, priority text, created_at timestamptz default now()
+);
+create table if not exists public.projects (
+  id bigint generated by default as identity primary key,
+  name text not null, status text, priority text, completion int default 0
+);
+create table if not exists public.goals (
+  id bigint generated by default as identity primary key,
+  title text not null, current int default 0, target int default 100, color text
+);
+create table if not exists public.activities (
+  id bigint generated by default as identity primary key,
+  action text, item text, "user" text, time text default 'Just now', created_at timestamptz default now()
+);
+alter table profiles enable row level security;
+alter table tasks enable row level security;
+alter table projects enable row level security;
+alter table goals enable row level security;
+alter table activities enable row level security;
+create policy "Public Usage" on profiles for all using (true);
+create policy "Public Usage" on tasks for all using (true);
+create policy "Public Usage" on projects for all using (true);
+create policy "Public Usage" on goals for all using (true);
+create policy "Public Usage" on activities for all using (true);
+`;
+            // Check if already open
+            if (document.getElementById('db-setup-modal')) return;
+
+            const modal = document.createElement('div');
+            modal.id = 'db-setup-modal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;';
+            modal.innerHTML = `
+                <div style="background:#1e293b;padding:2rem;border-radius:12px;max-width:600px;width:90%;color:#fff;box-shadow:0 0 50px rgba(0,0,0,0.5);">
+                    <h2 style="margin-top:0;color:#f472b6;">⚡ Setup Required</h2>
+                    <p>It looks like your Supabase database tables are missing. Please run this SQL script in your Supabase Dashboard > SQL Editor.</p>
+                    <textarea style="width:100%;height:200px;background:#0f172a;color:#cbd5e1;padding:10px;border-radius:8px;border:1px solid #334155;font-family:monospace;font-size:0.8rem;" readonly>${setupSQL}</textarea>
+                    <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;gap:10px;">
+                        <button onclick="navigator.clipboard.writeText(this.parentElement.previousElementSibling.value);this.innerText='Copied!'" style="padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;">Copy SQL</button>
+                        <button onclick="location.reload()" style="padding:8px 16px;background:#10b981;color:white;border:none;border-radius:6px;cursor:pointer;">I've Run It, Reload Page</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('workflowPPS_Theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const btn = document.getElementById('theme-toggle');
+            if (btn) btn.innerText = theme === 'light' ? '🌙' : '☀️';
+        }
+
+        // Call Init on Load
+        initApp();
+
+        // --- LOGIC: STATS & ACTIVITIES ---
+        function calculateStats() {
+            const total = DB.tasks.length;
+            const completed = DB.tasks.filter(t => t.status === 'Completed').length;
+            const inProgress = DB.tasks.filter(t => t.status === 'In Progress').length;
+            const efficiency = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            // Active projects: Unique types of non-completed tasks
+            const activeProjectsCount = new Set(DB.tasks.filter(t => t.status !== 'Completed').map(t => t.type)).size;
+
+            return { total, completed, inProgress, efficiency, activeProjectsCount };
+        }
+
+        async function addActivity(action, item, user) {
+            // Optimistic update
+            const newActivity = {
+                id: Date.now(),
+                action,
+                item,
+                user,
+                time: 'Just now'
+            };
+            // Limit to 10 locally
+            DB.activities = [newActivity, ...DB.activities.slice(0, 9)];
+
+            // Fire and forget log
+            supabaseClient.from('activities').insert({ action, item, user }).then(() => { });
+        }
+
+        async function addNewTaskDisplay(newTask) {
+            const { data, error } = await supabaseClient.from('tasks').insert([{
+                ...newTask,
+                status: 'Pending'
+            }]).select();
+
+            if (error) {
+                if (error.message.includes('relation') || error.message.includes('does not exist') || error.message.includes('schema') || error.code === '42P01') {
+                    showSetupModal();
+                    return;
+                }
+                alert('Error creating task: ' + error.message);
+                return;
+            }
+
+            if (data) {
+                DB.tasks.unshift(data[0]);
+                addActivity('Task Created', newTask.title, currentUser ? currentUser.name : 'You');
+                renderView('tasks');
+            }
+        }
+
+        async function cycleTaskStatus(taskId) {
+            const task = DB.tasks.find(t => t.id === taskId);
+            const statuses = ['Pending', 'In Progress', 'Review', 'Completed'];
+            if (task) {
+                const currentIndex = statuses.indexOf(task.status);
+                const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+
+                const { error } = await supabaseClient.from('tasks').update({ status: nextStatus }).eq('id', taskId);
+
+                if (!error) {
+                    task.status = nextStatus;
+                    addActivity('Status Updated', `${task.title} to ${nextStatus}`, currentUser ? currentUser.name : 'You');
+                    renderView(currentView);
+                } else {
+                    alert('Error updating status');
+                }
+            }
+        }
+
+
+        // --- AUTHENTICATION ---
+        function showSignup() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('signup-screen').classList.remove('hidden');
+            document.getElementById('signup-screen').style.display = 'flex';
+        }
+
+        function showLogin() {
+            document.getElementById('signup-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const pass = document.getElementById('signup-pass').value;
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Creating Account...';
+            btn.disabled = true;
+
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: pass,
+                options: {
+                    data: {
+                        full_name: name,
+                        role: 'Member'
+                    }
+                }
+            });
+
+            btn.innerText = originalText;
+            btn.disabled = false;
+
+            if (error) {
+                alert('Signup Error: ' + error.message);
+            } else {
+                if (data.session) {
+                    // Auto-login success (Email Confirm is OFF)
+                    if (data.user) {
+                        try {
+                            const { error: profError } = await supabaseClient.from('profiles').insert({
+                                id: data.user.id, email: email, full_name: name, role: 'Member'
+                            });
+                            if (profError) console.warn('Profile creation warning:', profError);
+                        } catch (e) {
+                            console.warn('Profile creation failed:', e);
+                        }
+                    }
+                    alert('Account created! Logging you in...');
+                    // onAuthStateChange will handle the rest
+                } else if (data.user) {
+                    // User created but no session (Email Confirm is ON)
+                    if (data.user) {
+                        // We still try to insert profile, though RLS might block it if not logged in.
+                        // Usually RLS allows insert for authenticated users, but here we aren't fully authed yet.
+                        // Ideally, profiles are created via Triggers to avoid this, but client-side:
+                        await supabaseClient.from('profiles').insert({
+                            id: data.user.id, email: email, full_name: name, role: 'Member'
+                        }).then(({ error }) => {
+                            if (error) console.log("Profile insert deferred until verification.");
+                        });
+                    }
+                    alert('Account created! 📧 IMPORTANT: Check your email to confirm your account before logging in.');
+                    showLogin();
+                }
+            }
+        }
+
+        async function seedDemoUser() {
+            // Use current timestamp to make email unique, avoiding rate limits/duplicate user errors
+            const timestamp = Date.now();
+            const email = `admin${timestamp}@workflow.com`;
+            const pass = '123456';
+
+            // Auto fill
+            document.getElementById('login-user').value = email;
+            document.getElementById('login-pass').value = pass;
+
+            if (confirm(`Create a NEW demo admin user (${email})?`)) {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: pass,
+                    options: { data: { full_name: 'SHREEVARDHANN A', role: 'Admin' } }
+                });
+
+                if (error) {
+                    alert('Signup Error: ' + error.message);
+                } else {
+                    if (data.session) {
+                        // Success! Interactive login worked.
+                        if (data.user) {
+                            try {
+                                const { error: profError } = await supabaseClient.from('profiles').insert({
+                                    id: data.user.id, email: email, full_name: 'SHREEVARDHANN A', role: 'Admin'
+                                });
+                                if (profError) console.warn('Profile creation warning:', profError);
+                            } catch (e) {
+                                console.warn('Profile creation failed:', e);
+                            }
+                        }
+                        alert('Demo user created! Logging you in...');
+                        // Handle session will be triggered automatically by onAuthStateChange
+                    } else if (data.user && !data.session) {
+                        // User created but no session -> Email Confirmation is ON
+                        alert('CRITICAL: User created but NOT logged in.\n\nCAUSE: "Confirm Email" is ENABLED in your Supabase Dashboard.\n\nFIX: Go to Authentication > Providers > Email and DISABLE "Confirm Email". Then try again.');
+                    }
+                }
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const userBox = document.getElementById('login-user');
+            const passBox = document.getElementById('login-pass');
+            if (!userBox || !passBox) return;
+
+            const email = userBox.value.trim().toLowerCase();
+            const pass = passBox.value;
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Signing In...';
+            btn.disabled = true;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: pass
+            });
+
+            btn.innerText = originalText;
+            btn.disabled = false;
+
+            if (error) {
+                if (error.message.includes('Email not confirmed')) {
+                    alert('Login Failed: Email not confirmed. Check inbox or disable email confirmation in Supabase.');
+                } else {
+                    alert('Login Error: ' + error.message);
+                }
+            }
+        }
+
+        async function forgotPassword() {
+            const email = prompt("Enter your email address to reset password:");
+            if (!email) return;
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href
+            });
+            if (error) alert("Error sending reset email: " + error.message);
+            else alert("Password reset link sent to " + email);
+        }
+
+        function enterApp(animate = true) {
+            const login = document.getElementById('login-screen');
+            const app = document.getElementById('app-interface');
+            login.classList.add('hidden');
+            app.classList.remove('hidden');
+
+            document.getElementById('display-name').innerText = currentUser.name;
+            const roleBadge = document.getElementById('display-role');
+            roleBadge.innerText = currentUser.role;
+            roleBadge.className = `badge badge-${currentUser.role === 'Admin' ? 'admin' : 'member'}`;
+
+            updateThemeIcon(localStorage.getItem('workflowPPS_Theme') || 'dark');
+            renderNav();
+            renderView('dashboard');
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+        }
+
+        function renderNav() {
+            const container = document.getElementById('nav-container');
+            const items = [
+                { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+                { id: 'tasks', label: 'Task Board', icon: '✅' },
+                { id: 'projects', label: 'Projects', icon: '🚀' },
+                { id: 'goals', label: 'Goals & Targets', icon: '🎯' },
+                { id: 'team', label: 'Team', icon: '👥' },
+                { id: 'reports', label: 'Reports', icon: '📈' },
+            ];
+
+            container.innerHTML = items.map(item => `
+                <div class="nav-item ${currentView === item.id ? 'active' : ''}" onclick="renderView('${item.id}')">
+                    <span>${item.icon}</span> ${item.label}
+                </div>
+            `).join('');
+        }
+
+        // --- VIEW RENDERING ---
+        function renderView(viewId) {
+            currentView = viewId;
+            document.getElementById('page-title').innerText = viewId.charAt(0).toUpperCase() + viewId.slice(1);
+            renderNav();
+            const content = document.getElementById('main-content');
+
+            content.style.opacity = '0';
+            setTimeout(() => {
+                content.innerHTML = getViewHTML(viewId);
+                content.style.animation = 'fadeIn 0.3s forwards';
+                content.style.opacity = '1';
+            }, 100);
+        }
+
+        function getViewHTML(view) {
+            const stats = calculateStats();
+            const isAdmin = currentUser.role === 'Admin';
+
+            if (view === 'dashboard') {
+                return `
+                    <div class="card card-hero">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Hello, ${currentUser.name}! 👋</h2>
+                        <p style="opacity: 0.9; font-size: 1.1rem;">System is running smoothly. You have <b style="color: var(--primary); font-size: 1.3rem;">${DB.tasks.filter(t => t.status !== 'Completed').length}</b> pending tasks.</p>
+                        <div style="position: absolute; right: 20px; top: 20px; opacity: 0.2; font-size: 5rem;">📊</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="card glass-panel" style="border-top: 4px solid var(--accent);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Total Tasks</div>
+                            <div style="font-size: 3rem; font-weight: 700; color: var(--accent); text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);">${stats.total}</div>
+                        </div>
+                        <div class="card glass-panel" style="border-top: 4px solid var(--success);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Team Efficiency</div>
+                            <div style="font-size: 3rem; font-weight: 700; color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);">${stats.efficiency}%</div>
+                        </div>
+                        <div class="card glass-panel" style="border-top: 4px solid var(--primary);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Active Projects</div>
+                            <div style="font-size: 3rem; font-weight: 700; color: var(--primary); text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);">${stats.activeProjectsCount}</div>
+                        </div>
+                         <div class="card glass-panel" style="border-top: 4px solid var(--warning);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">In Progress</div>
+                            <div style="font-size: 3rem; font-weight: 700; color: var(--warning); text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);">${stats.inProgress}</div>
+                        </div>
+                    </div>
+
+                    <div class="card glass-panel">
+                        <h3 class="text-gradient" style="margin-bottom: 1.5rem;">Recent System Updates</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            ${DB.activities.map(act => `
+                                <div style="padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 3px solid ${act.action === 'Task Completed' ? 'var(--success)' : 'var(--primary)'};">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+                                        <b>${act.action}</b> <span style="color:var(--text-muted); font-size:0.8rem;">${act.time}</span>
+                                    </div>
+                                    <div style="color: var(--text-muted);">${act.user} - ${act.item}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (view === 'tasks') {
+                return `
+                    <div class="card glass-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 class="text-gradient">Task Board</h3>
+                            <button class="btn" onclick="openModal('task_add')">+ New Task</button>
+                        </div>
+                         <div style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                            💡 Tip: Click on a status badge to cycle its status.
+                        </div>
+                        <table>
+                            <thead><tr><th>Task</th><th>Type</th><th>Deadline</th><th>Status</th><th>Priority</th><th>Action</th></tr></thead>
+                            <tbody>
+                                ${DB.tasks.map(t => `
+                                    <tr>
+                                        <td><b style="color: var(--text-main);">${t.title}</b><br><span style="font-size:0.8rem; color:var(--text-muted);">${t.assignee}</span></td>
+                                        <td>${t.type || 'General'}</td>
+                                        <td>${t.deadline}</td>
+                                        <td>
+                                            <span 
+                                                class="badge" 
+                                                onclick="cycleTaskStatus(${t.id})"
+                                                style="cursor: pointer; user-select: none; background:${t.status === 'Completed' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color:${t.status === 'Completed' ? '#6ee7b7' : '#fca5a5'}; border: 1px solid ${t.status === 'Completed' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}">
+                                                ${t.status}
+                                            </span>
+                                        </td>
+                                        <td><span class="badge" style="background: rgba(139, 92, 246, 0.1); color: #c4b5fd;">${t.priority || 'Medium'}</span></td>
+                                        <td>
+                                            ${isAdmin ? `<button class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openModal('task_edit', ${t.id})">Edit</button>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (view === 'projects') {
+                return `
+                    <div class="card glass-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 class="text-gradient">All Projects</h3>
+                            <button class="btn" onclick="openModal('project_add')">+ New Project</button>
+                        </div>
+                        <table>
+                            <thead><tr><th>Project Name</th><th>Status</th><th>Priority</th><th>Progress</th><th>Action</th></tr></thead>
+                            <tbody>
+                                ${DB.projects.map(p => `
+                                    <tr>
+                                        <td><b>${p.name}</b></td>
+                                        <td><span class="badge badge-admin" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3);">${p.status}</span></td>
+                                        <td>${p.priority}</td>
+                                        <td style="width: 200px;">
+                                            <div class="progress-container" style="margin-top:0;">
+                                                <div class="progress-bar" style="width: ${p.completion}%; background: var(--primary); box-shadow: 0 0 10px var(--primary-glow);"></div>
+                                            </div>
+                                            <div style="font-size:0.75rem; text-align:right; margin-top:4px; color:var(--text-muted);">${p.completion}%</div>
+                                        </td>
+                                        <td>
+                                             ${isAdmin ? `<button class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openModal('project_edit', ${p.id})">Edit</button>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (view === 'team') {
+                return `
+                    <div class="card glass-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 class="text-gradient">User Access Management</h3>
+                            <div>
+                                <button class="btn" onclick="openModal('member_add')">+ Add Member</button>
+                            </div>
+                        </div>
+                        <table>
+                            <thead><tr><th>Name</th><th>Role</th><th>Email (Login ID)</th><th>Action</th></tr></thead>
+                            <tbody>
+                                ${DB.users.map(u => `
+                                    <tr>
+                                        <td><b>${u.name}</b></td>
+                                        <td><span class="badge ${u.role === 'Admin' ? 'badge-admin' : 'badge-member'}">${u.role}</span></td>
+                                        <td>${u.username}</td>
+                                        <td>
+                                            ${currentUser.id === u.id ? `<button class="btn-outline" style="padding: 6px 12px; font-size: 0.75rem; margin-right:5px;" onclick="openModal('change_password')">Change Pass</button>` : ''}
+                                            ${isAdmin ? `<button class="btn-outline" style="padding: 6px 12px; font-size: 0.75rem;" onclick="openModal('member_edit', '${u.id}')">Edit</button>` : ''}
+                                            <button class="btn-outline" style="padding: 6px 12px; font-size: 0.75rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="deleteMember('${u.id}')">Delete</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (view === 'goals') {
+                return `
+                    <div class="card glass-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 class="text-gradient">Organizational Goals</h3>
+                            ${isAdmin ? `<button class="btn" onclick="openModal('goal_add')">+ New Goal</button>` : ''}
+                        </div>
+                        <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Tracking key performance indicators.</p>
+                        
+                        ${DB.goals.map((g, index) => {
+                    const percent = Math.round((g.current / g.target) * 100);
+                    return `
+                                <div style="margin-bottom: 2rem; position: relative; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.02);">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <b>${g.title}</b>
+                                        <div style="display:flex; gap:10px; align-items:center;">
+                                            <span style="font-weight: 600; color: ${g.color}; text-shadow: 0 0 10px ${g.color}40;">${percent}%</span>
+                                            ${isAdmin ? `<button class="btn-outline" style="padding: 4px 10px; font-size: 0.7rem;" onclick="openModal('goal_edit', ${index})">Edit</button>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: ${percent}%; background: ${g.color}; box-shadow: 0 0 15px ${g.color}60;"></div>
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; text-align: right;">${g.current.toLocaleString()} / ${g.target.toLocaleString()}</div>
+                                </div>
+                            `;
+                }).join('')}
+                    </div>
+                `;
+            }
+
+            if (view === 'reports') {
+                // Task Distribution Calculation
+                const total = DB.tasks.length;
+                const done = DB.tasks.filter(t => t.status === 'Completed').length;
+                const progress = DB.tasks.filter(t => t.status === 'In Progress').length;
+                const pending = total - done - progress;
+
+                const doneDeg = total ? (done / total) * 100 : 0;
+                const progressDeg = total ? (progress / total) * 100 : 0;
+
+                const p1 = doneDeg;
+                const p2 = doneDeg + progressDeg;
+
+                const stats = DB.weeklyStats || [40, 60, 30, 80, 50, 75, 90];
+                const maxStat = Math.max(...stats);
+
+                return `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="card glass-panel">
+                            <h3>Weekly Velocity</h3>
+                            <div style="height: 200px; display: flex; align-items: flex-end; gap: 10px; margin-top: 20px;">
+                                ${stats.map((val, i) => {
+                    const h = (val / maxStat) * 100;
+                    const opacity = 0.3 + ((i / stats.length) * 0.7);
+                    return `<div class="bar-anim" style="flex: 1; background: rgba(139, 92, 246, ${opacity}); height: ${h}%; border-radius: 4px; transition: height 0.5s;"></div>`;
+                }).join('')}
+                            </div>
+                            <div style="text-align: center; margin-top: 15px; display:flex; justify-content:space-between; color: var(--text-muted); font-size: 0.8rem;">
+                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                            </div>
+                        </div>
+                        <div class="card glass-panel">
+                            <h3>Task Distribution</h3>
+                            <div style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 150px; height: 150px; border-radius: 50%; 
+                                    background: conic-gradient(
+                                        #10b981 0% ${p1}%, 
+                                        #f59e0b ${p1}% ${p2}%, 
+                                        #ef4444 ${p2}% 100%
+                                    ); 
+                                    position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.3);">
+                                    <div style="position: absolute; inset: 20px; background: var(--bg-card); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-direction: column;">
+                                        <span style="font-size: 0.8rem; color: var(--text-muted);">Total</span>
+                                        <span style="font-size: 1.5rem; color: var(--text-main);">${total}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: center; gap: 15px; font-size: 0.8rem;">
+                                <span style="color: #10b981;">● Done (${done})</span>
+                                <span style="color: #f59e0b;">● In Progress (${progress})</span>
+                                <span style="color: #ef4444;">● Pending (${pending})</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `<div class="card"><h3>Coming Soon</h3></div>`;
+        }
+
+        // --- ACTIONS & MODALS ---
+        function togglePasswords() {
+            showPasswords = !showPasswords;
+            renderView('team');
+        }
+
+        async function deleteMember(id) {
+            if (id === currentUser.id) {
+                alert("You cannot delete your own account!");
+                return;
+            }
+            if (confirm('Are you sure you want to delete this user?')) {
+                const { error } = await supabaseClient.from('profiles').delete().eq('id', id);
+                if (!error) {
+                    DB.users = DB.users.filter(u => u.id !== id);
+                    renderView('team');
+                    alert("User removed from App. \n\nNOTE: They can still login until you disable them in Supabase Auth.");
+                } else {
+                    alert("Error deleting member: " + error.message);
+                }
+            }
+        }
+
+
+        function openModal(type, id = null) {
+            currentModalType = type;
+            currentEditingId = id;
+            const modal = document.getElementById('input-modal');
+            const title = document.getElementById('modal-title');
+            const fields = document.getElementById('modal-fields');
+
+            modal.classList.add('active');
+
+            if (type === 'change_password') {
+                title.innerText = 'Change Password';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" name="password" required></div>
+                    <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input" name="confirm_password" required></div>
+                `;
+            } else if (type === 'project_add') {
+                title.innerText = 'New Project';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">Project Name</label><input class="form-input" name="name" required></div>
+                    <div class="form-group"><label class="form-label">Status</label><select class="form-input" name="status"><option>Planning</option><option>In Progress</option><option>Completed</option></select></div>
+                    <div class="form-group"><label class="form-label">Priority</label><select class="form-input" name="priority"><option>Low</option><option>Medium</option><option>High</option></select></div>
+                `;
+            } else if (type === 'project_edit') {
+                const p = DB.projects.find(x => x.id === id);
+                title.innerText = 'Edit Project';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">Project Name</label><input class="form-input" name="name" value="${p.name}" required></div>
+                    <div class="form-group"><label class="form-label">Status</label><select class="form-input" name="status">
+                        <option ${p.status === 'Planning' ? 'selected' : ''}>Planning</option>
+                        <option ${p.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                        <option ${p.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select></div>
+                    <div class="form-group"><label class="form-label">Completion (%)</label><input type="number" class="form-input" name="completion" value="${p.completion}" min="0" max="100"></div>
+                `;
+            } else if (type === 'task_add') {
+                title.innerText = 'New Task';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">Task Title</label><input class="form-input" name="title" required></div>
+                    <div class="form-group"><label class="form-label">Assignee</label><input class="form-input" name="assignee" required></div>
+                    <div class="form-group"><label class="form-label">Type</label><select class="form-input" name="type"><option>Frontend</option><option>Backend</option><option>Design</option><option>Docs</option></select></div>
+                    <div class="form-group"><label class="form-label">Priority</label><select class="form-input" name="priority"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+                    <div class="form-group"><label class="form-label">Deadline</label><input type="date" class="form-input" name="deadline" required></div>
+                `;
+            } else if (type === 'task_edit') {
+                const t = DB.tasks.find(x => x.id === id);
+                title.innerText = 'Edit Task';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">Task Title</label><input class="form-input" name="title" value="${t.title}" required></div>
+                    <div class="form-group"><label class="form-label">Assignee</label><input class="form-input" name="assignee" value="${t.assignee}" required></div>
+                    <div class="form-group"><label class="form-label">Status</label><select class="form-input" name="status">
+                        <option ${t.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option ${t.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                        <option ${t.status === 'Review' ? 'selected' : ''}>Review</option>
+                        <option ${t.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select></div>
+                    <div class="form-group"><label class="form-label">Deadline</label><input type="date" class="form-input" name="deadline" value="${t.deadline}"></div>
+                `;
+            } else if (type === 'member_add') {
+                title.innerText = 'Add Team Member';
+                fields.innerHTML = `
+                   <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" name="name" required></div>
+                   <div class="form-group"><label class="form-label">Role</label><select class="form-input" name="role"><option>Member</option><option>Admin</option></select></div>
+                   <div class="form-group"><label class="form-label">Email (Login ID)</label><input class="form-input" name="email" type="email" placeholder="user@example.com" required></div>
+                   <div class="form-group"><label class="form-label">Password</label><input class="form-input" name="password" value="123456" required></div>
+                `;
+                // Ensure button is visible
+                setTimeout(() => {
+                    const submitBtn = document.getElementById('input-modal').querySelector('button[type="submit"]');
+                    if (submitBtn) submitBtn.style.display = 'block';
+                }, 0);
+            } else if (type === 'member_edit') {
+                const u = DB.users.find(x => x.id === id);
+                title.innerText = 'Edit Member';
+                fields.innerHTML = `
+                   <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" name="name" value="${u.name}" required></div>
+                   <div class="form-group"><label class="form-label">Role</label><select class="form-input" name="role">
+                        <option ${u.role === 'Member' ? 'selected' : ''}>Member</option>
+                        <option ${u.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                    </select></div>
+                   <div class="form-group"><label class="form-label">Username</label><input class="form-input" name="username" value="${u.username}" disabled style="background:#f3f4f6; cursor:not-allowed; opacity:0.5;"></div>
+                `;
+            } else if (type === 'goal_add') {
+                title.innerText = 'New Goal';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">Goal Title</label><input class="form-input" name="title" required></div>
+                    <div class="form-group"><label class="form-label">Current Value</label><input type="number" class="form-input" name="current" required></div>
+                    <div class="form-group"><label class="form-label">Target Value</label><input type="number" class="form-input" name="target" required></div>
+                    <div class="form-group"><label class="form-label">Color Theme</label><select class="form-input" name="color"><option value="#10b981">Green (Growth)</option><option value="#6366f1">Purple (User)</option><option value="#f59e0b">Orange (Product)</option><option value="#ef4444">Red (Urgent)</option></select></div>
+                `;
+            } else if (type === 'goal_edit') {
+                const g = DB.goals[id]; // Index
+                title.innerText = 'Edit Goal';
+                fields.innerHTML = `
+                    <div class="form-group"><label class="form-label">Goal Title</label><input class="form-input" name="title" value="${g.title}" required></div>
+                    <div class="form-group"><label class="form-label">Current Value</label><input type="number" class="form-input" name="current" value="${g.current}" required></div>
+                    <div class="form-group"><label class="form-label">Target Value</label><input type="number" class="form-input" name="target" value="${g.target}" required></div>
+                    <div class="form-group"><label class="form-label">Color Theme</label><select class="form-input" name="color">
+                        <option value="#10b981" ${g.color === '#10b981' ? 'selected' : ''}>Green (Growth)</option>
+                        <option value="#6366f1" ${g.color === '#6366f1' ? 'selected' : ''}>Purple (User)</option>
+                        <option value="#f59e0b" ${g.color === '#f59e0b' ? 'selected' : ''}>Orange (Product)</option>
+                        <option value="#ef4444" ${g.color === '#ef4444' ? 'selected' : ''}>Red (Urgent)</option>
+                    </select></div>
+                `;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('input-modal').classList.remove('active');
+        }
+
+        async function handleModalSubmit(e) {
+            e.preventDefault();
+            try {
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalText = btn.innerText;
+                btn.innerText = 'Saving...';
+                btn.disabled = true;
+
+                if (currentModalType === 'project_add') {
+                    const { data: proj, error } = await supabaseClient.from('projects').insert({
+                        name: data.name, status: data.status,
+                        priority: data.priority, completion: 0
+                    }).select();
+                    if (!error && proj) DB.projects.push(proj[0]);
+                }
+                else if (currentModalType === 'project_edit') {
+                    const { error } = await supabaseClient.from('projects').update({
+                        name: data.name, status: data.status, completion:
+                            parseInt(data.completion)
+                    }).eq('id', currentEditingId);
+                    if (!error) {
+                        const p = DB.projects.find(x => x.id === currentEditingId);
+                        if (p) { p.name = data.name; p.status = data.status; p.completion = parseInt(data.completion) || 0; }
+                    }
+                }
+                else if (currentModalType === 'task_add') {
+                    const newTask = {
+                        title: data.title,
+                        assignee: data.assignee,
+                        type: data.type,
+                        priority: data.priority,
+                        deadline: data.deadline
+                    };
+                    await addNewTaskDisplay(newTask);
+                    closeModal();
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+                else if (currentModalType === 'task_edit') {
+                    const { error } = await supabaseClient.from('tasks').update({
+                        title: data.title, assignee: data.assignee, status:
+                            data.status, deadline: data.deadline
+                    }).eq('id', currentEditingId);
+                    if (!error) {
+                        const t = DB.tasks.find(x => x.id === currentEditingId);
+                        if (t) { t.title = data.title; t.assignee = data.assignee; t.status = data.status; t.deadline = data.deadline; }
+                    }
+                }
+                else if (currentModalType === 'member_add') {
+                    // Create temp client to avoid logging out admin
+                    const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+                    });
+
+                    const email = data.email.trim();
+                    const password = data.password.trim();
+
+                    const { data: authData, error: authError } = await tempClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: { data: { full_name: data.name, role: data.role } }
+                    });
+
+                    if (authError) {
+                        alert("Error creating user: " + authError.message);
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        return; // Keep modal open
+                    }
+
+                    if (authData.user) {
+                        const { error: profileError } = await supabaseClient.from('profiles').insert({
+                            id: authData.user.id,
+                            email: data.email,
+                            full_name: data.name,
+                            role: data.role
+                        });
+
+                        if (profileError) {
+                            console.error("Profile creation error", profileError);
+                            alert("User created but profile failed: " + profileError.message);
+                        } else {
+                            alert(`Member added successfully!\n\nUser can login with:\nEmail: ${data.email}\nPassword: ${data.password}`);
+                            // Refresh team view
+                            const { data: newProfiles } = await supabaseClient.from('profiles').select('*');
+                            if (newProfiles) {
+                                DB.users = newProfiles.map(p => ({
+                                    id: p.id,
+                                    name: p.full_name || p.email,
+                                    username: p.email,
+                                    role: p.role || 'Member',
+                                    password: '***'
+                                }));
+                            }
+                        }
+                    }
+                }
+                else if (currentModalType === 'member_edit') {
+                    const { error } = await supabaseClient.from('profiles').update({ full_name: data.name, role: data.role }).eq('id',
+                        currentEditingId);
+                    if (!error) {
+                        const u = DB.users.find(x => x.id === currentEditingId);
+                        if (u) { u.name = data.name; u.role = data.role; }
+                    }
+                }
+                else if (currentModalType === 'goal_add') {
+                    const { data: goal, error } = await supabaseClient.from('goals').insert({ title: data.title, current: parseInt(data.current), target: parseInt(data.target), color: data.color }).select();
+                    if (!error && goal) DB.goals.push(goal[0]);
+                }
+                else if (currentModalType === 'goal_edit') {
+                    const goal = DB.goals[currentEditingId];
+                    if (goal && goal.id) {
+                        const { error } = await supabaseClient.from('goals').update({ title: data.title, current: parseInt(data.current), target: parseInt(data.target), color: data.color }).eq('id', goal.id);
+                        if (!error) {
+                            goal.title = data.title; goal.current = parseInt(data.current); goal.target = parseInt(data.target); goal.color = data.color;
+                        }
+                    }
+                }
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+                closeModal();
+                renderView(currentView);
+            } catch (error) {
+                alert("Error saving data: " + error.message);
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
