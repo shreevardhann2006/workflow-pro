@@ -1,36 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 
 const DataContext = createContext();
 
 export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
-    // Initial Data
-    const initialTasks = [
-        { id: 1, title: 'Design System Update v2.0', assignee: 'Alex Morgan', due: 'Oct 24', status: 'Completed', priority: 'High', type: 'Design' },
-        { id: 2, title: 'Integration with Payment Gateway', assignee: 'Sarah Smith', due: 'Oct 26', status: 'In Progress', priority: 'Critical', type: 'Backend' },
-        { id: 3, title: 'Mobile Responsive Fixes', assignee: 'John Doe', due: 'Oct 28', status: 'Pending', priority: 'Medium', type: 'Frontend' },
-        { id: 4, title: 'User Onboarding Flow', assignee: 'Emily Chen', due: 'Oct 30', status: 'In Progress', priority: 'High', type: 'UX' },
-        { id: 5, title: 'API Documentation', assignee: 'Mike Ross', due: 'Nov 02', status: 'Review', priority: 'Low', type: 'Docs' },
-    ];
-
-    const initialMembers = [
-        { id: 1, name: 'Alex Morgan', role: 'Project Manager', email: 'alex@company.com', status: 'Active' },
-        { id: 2, name: 'Sarah Smith', role: 'Backend Lead', email: 'sarah@company.com', status: 'Active' },
-        { id: 3, name: 'John Doe', role: 'Frontend Developer', email: 'john@company.com', status: 'On Leave' },
-        { id: 4, name: 'Emily Chen', role: 'UI/UX Designer', email: 'emily@company.com', status: 'Active' },
-        { id: 5, name: 'Mike Ross', role: 'QA Engineer', email: 'mike@company.com', status: 'Active' },
-    ];
-
-    const initialActivities = [
-        { id: 1, action: 'Task Completed', item: 'Design System Update v2.0', user: 'Alex Morgan', time: '2 hours ago' },
-        { id: 2, action: 'New Comment', item: 'API Documentation', user: 'Mike Ross', time: '5 hours ago' },
-        { id: 3, action: 'Status Updated', item: 'User Onboarding Flow', user: 'Emily Chen', time: '1 day ago' }
-    ];
-
-    const [tasks, setTasks] = useState(initialTasks);
-    const [members, setMembers] = useState(initialMembers);
-    const [activities, setActivities] = useState(initialActivities);
+    const [tasks, setTasks] = useState([]);
+    const [members, setMembers] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Derived State
     const [stats, setStats] = useState({
@@ -40,6 +19,54 @@ export const DataProvider = ({ children }) => {
         efficiency: 0,
         activeProjects: 0
     });
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const { data: tasksData, error: tasksError } = await supabase
+                .from('tasks')
+                .select('*')
+                .order('id', { ascending: false });
+
+            const { data: membersData, error: membersError } = await supabase
+                .from('members')
+                .select('*');
+
+            const { data: activitiesData, error: activitiesError } = await supabase
+                .from('activities')
+                .select('*')
+                .order('id', { ascending: false })
+                .limit(10);
+
+            if (tasksError) throw tasksError;
+            if (membersError) throw membersError;
+            if (activitiesError) throw activitiesError;
+
+            // Map DB fields to UI fields if necessary
+            const formattedTasks = tasksData.map(t => ({
+                ...t,
+                due: t.due_date // Map due_date from DB to due for UI
+            }));
+
+            const formattedActivities = activitiesData.map(a => ({
+                ...a,
+                user: a.user_name, // Map user_name from DB to user for UI
+                time: a.time_text  // Map time_text from DB to time for UI
+            }));
+
+            setTasks(formattedTasks || []);
+            setMembers(membersData || []);
+            setActivities(formattedActivities || []);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const total = tasks.length;
@@ -60,30 +87,74 @@ export const DataProvider = ({ children }) => {
         });
     }, [tasks]);
 
-    const addTask = (newTask) => {
-        const task = { ...newTask, id: tasks.length + 1, status: 'Pending' };
-        setTasks([task, ...tasks]);
-        addActivity('Task Created', task.title, 'You'); // "You" as current user
-    };
+    const addTask = async (newTask) => {
+        try {
+            const { data, error } = await supabase
+                .from('tasks')
+                .insert([{
+                    title: newTask.title,
+                    assignee: newTask.assignee,
+                    due_date: newTask.due,
+                    status: 'Pending',
+                    priority: newTask.priority,
+                    type: newTask.type
+                }])
+                .select();
 
-    const updateTaskStatus = (taskId, newStatus) => {
-        const task = tasks.find(t => t.id === taskId);
-        if (task && task.status !== newStatus) {
-            const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t);
-            setTasks(updatedTasks);
-            addActivity('Status Updated', `${task.title} to ${newStatus}`, 'You');
+            if (error) throw error;
+
+            if (data) {
+                const createdTask = { ...data[0], due: data[0].due_date };
+                setTasks([createdTask, ...tasks]);
+                addActivity('Task Created', createdTask.title, 'You');
+            }
+        } catch (error) {
+            console.error('Error adding task:', error);
         }
     };
 
-    const addActivity = (action, item, user) => {
-        const newActivity = {
-            id: Date.now(),
-            action,
-            item,
-            user,
-            time: 'Just now'
-        };
-        setActivities([newActivity, ...activities.slice(0, 9)]); // Keep last 10
+    const updateTaskStatus = async (taskId, newStatus) => {
+        try {
+            const { error } = await supabase
+                .from('tasks')
+                .update({ status: newStatus })
+                .eq('id', taskId);
+
+            if (error) throw error;
+
+            const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t);
+            setTasks(updatedTasks);
+
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                addActivity('Status Updated', `${task.title} to ${newStatus}`, 'You');
+            }
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
+    };
+
+    const addActivity = async (action, item, user) => {
+        try {
+            const { data, error } = await supabase
+                .from('activities')
+                .insert([{
+                    action,
+                    item,
+                    user_name: user,
+                    time_text: 'Just now'
+                }])
+                .select();
+
+            if (error) throw error;
+
+            if (data) {
+                const newActivity = { ...data[0], user: data[0].user_name, time: data[0].time_text };
+                setActivities([newActivity, ...activities.slice(0, 9)]);
+            }
+        } catch (error) {
+            console.error('Error adding activity:', error);
+        }
     };
 
     return (
