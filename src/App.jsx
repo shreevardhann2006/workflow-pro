@@ -1,4 +1,4 @@
-```javascript
+
 import React, { useState } from 'react';
 import { DataProvider } from './context/DataContext';
 import Layout from './components/Layout';
@@ -12,7 +12,7 @@ function App() {
   const [currentView, setCurrentView] = useState('Dashboard');
 
   const renderView = () => {
-    switch(currentView) {
+    switch (currentView) {
       case 'Dashboard': return <Dashboard />;
       case 'Task Board': return <TaskBoard />;
       case 'Reports': return <TrackRecord />;
@@ -32,4 +32,4 @@ function App() {
 }
 
 export default App;
-```
+

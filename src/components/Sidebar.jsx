@@ -1,4 +1,4 @@
-```
+
 import React from 'react';
 import { LayoutDashboard, CheckSquare, Target, Users, BarChart3, Settings } from 'lucide-react';
 
@@ -24,11 +24,10 @@ const Sidebar = ({ currentView, onNavigate }) => {
                     <button
                         key={index}
                         onClick={() => onNavigate(item.label)}
-                        className={`w - full flex items - center gap - 3 px - 4 py - 3 rounded - xl transition - all duration - 200 group ${
-    currentView === item.label
-        ? 'bg-[#6366f1] text-white shadow-lg shadow-[#6366f1]/20'
-        : 'text-[#94a3b8] hover:bg-[#2d3142] hover:text-white'
-} `}
+                        className={`w - full flex items - center gap - 3 px - 4 py - 3 rounded - xl transition - all duration - 200 group ${currentView === item.label
+                                ? 'bg-[#6366f1] text-white shadow-lg shadow-[#6366f1]/20'
+                                : 'text-[#94a3b8] hover:bg-[#2d3142] hover:text-white'
+                            } `}
                     >
                         <item.icon size={20} className={currentView === item.label ? 'text-white' : 'text-[#6366f1] group-hover:text-white'} />
                         <span className="font-medium">{item.label}</span>
