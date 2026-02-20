@@ -27,6 +27,17 @@ export const DataProvider = ({ children }) => {
     const fetchData = async () => {
         try {
             setLoading(true);
+
+            // Check if we are using the placeholder client
+            if (supabase.supabaseUrl === 'https://placeholder.supabase.co') {
+                console.warn('Supabase URL is missing. Using local empty state. Please configure your .env or Vercel Environment Variables.');
+                setTasks([]);
+                setMembers([]);
+                setActivities([]);
+                setLoading(false);
+                return;
+            }
+
             const { data: tasksData, error: tasksError } = await supabase
                 .from('tasks')
                 .select('*')
@@ -63,6 +74,10 @@ export const DataProvider = ({ children }) => {
             setActivities(formattedActivities || []);
         } catch (error) {
             console.error('Error fetching data:', error);
+            // Fallback to empty arrays on error to prevent crashing the UI completely
+            setTasks([]);
+            setMembers([]);
+            setActivities([]);
         } finally {
             setLoading(false);
         }
