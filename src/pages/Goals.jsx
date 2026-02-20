@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
-import { Target, Flag, CalendarCheck, TrendingUp } from 'lucide-react';
+import { Target, Flag, CalendarCheck, TrendingUp, Users } from 'lucide-react';
 
 const Goals = () => {
     return (
