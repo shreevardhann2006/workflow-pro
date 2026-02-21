@@ -34,10 +34,14 @@ export const DataProvider = ({ children }) => {
 
             // Check if we are using the placeholder client
             if (isPlaceholder) {
-                console.warn('Supabase URL is missing. Using local empty state. Please configure your .env or Vercel Environment Variables.');
-                setTasks([]);
-                setMembers([]);
-                setActivities([]);
+                console.warn('Supabase URL is missing. Using local empty state backed by LocalStorage.');
+                const storedTasks = JSON.parse(localStorage.getItem('wt_tasks')) || [];
+                const storedMembers = JSON.parse(localStorage.getItem('wt_members')) || [];
+                const storedActivities = JSON.parse(localStorage.getItem('wt_activities')) || [];
+
+                setTasks(storedTasks);
+                setMembers(storedMembers);
+                setActivities(storedActivities);
                 setLoading(false);
                 return;
             }
@@ -104,7 +108,24 @@ export const DataProvider = ({ children }) => {
             efficiency,
             activeProjects
         });
-    }, [tasks]);
+
+        // Sync to LocalStorage if using placeholder mode
+        if (isPlaceholder && !loading) {
+            localStorage.setItem('wt_tasks', JSON.stringify(tasks));
+        }
+    }, [tasks, loading]);
+
+    useEffect(() => {
+        if (isPlaceholder && !loading) {
+            localStorage.setItem('wt_members', JSON.stringify(members));
+        }
+    }, [members, loading]);
+
+    useEffect(() => {
+        if (isPlaceholder && !loading) {
+            localStorage.setItem('wt_activities', JSON.stringify(activities));
+        }
+    }, [activities, loading]);
 
     const addTask = async (newTask) => {
         try {

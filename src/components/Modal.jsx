@@ -225,7 +225,7 @@ const Modal = () => {
                     {(activeModal === 'task' || activeModal === 'project' || activeModal === 'member') && (
                         <button
                             onClick={activeModal === 'task' ? handleCreateTask : activeModal === 'project' ? handleCreateProject : handleCreateMember}
-                            disabled={!titleStr.trim()}
+                            disabled={!titleStr.trim() || (activeModal === 'member' && !memberEmail.trim())}
                             className="px-4 py-2 rounded-xl text-sm font-medium bg-[#6366f1] text-white hover:bg-[#4f46e5] disabled:bg-[#6366f1]/50 disabled:cursor-not-allowed shadow-lg shadow-[#6366f1]/25 transition-all"
                         >
                             Create {activeModal === 'task' ? 'Task' : activeModal === 'project' ? 'Project' : 'Member'}
