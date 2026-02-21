@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase, isPlaceholder } from '../supabaseClient';
+import { supabase, isPlaceholder as envIsPlaceholder } from '../supabaseClient';
 
 const DataContext = createContext();
 
@@ -11,6 +11,7 @@ export const DataProvider = ({ children }) => {
     const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeModal, setActiveModal] = useState(null);
+    const [isLocalMode, setIsLocalMode] = useState(envIsPlaceholder);
 
     const openModal = (modalName) => setActiveModal(modalName);
     const closeModal = () => setActiveModal(null);
@@ -32,9 +33,9 @@ export const DataProvider = ({ children }) => {
         try {
             setLoading(true);
 
-            // Check if we are using the placeholder client
-            if (isPlaceholder) {
-                console.warn('Supabase URL is missing. Using local empty state backed by LocalStorage.');
+            // Check if we are using the placeholder client OR fell back previously
+            if (isLocalMode) {
+                console.warn('Supabase URL is missing or unreachable. Using local empty state backed by LocalStorage.');
                 const storedTasks = JSON.parse(localStorage.getItem('wt_tasks')) || [];
                 const storedMembers = JSON.parse(localStorage.getItem('wt_members')) || [];
                 const storedActivities = JSON.parse(localStorage.getItem('wt_activities')) || [];
@@ -81,11 +82,17 @@ export const DataProvider = ({ children }) => {
             setMembers(membersData || []);
             setActivities(formattedActivities || []);
         } catch (error) {
-            console.error('Error fetching data:', error);
-            // Fallback to empty arrays on error to prevent crashing the UI completely
-            setTasks([]);
-            setMembers([]);
-            setActivities([]);
+            console.error('Error fetching data from Supabase. Falling back to Local Storage Mode:', error);
+            setIsLocalMode(true); // Permanently switch to local state mode for this session
+
+            // Immediately load from local storage since Supabase failed (e.g., missing tables)
+            const storedTasks = JSON.parse(localStorage.getItem('wt_tasks')) || [];
+            const storedMembers = JSON.parse(localStorage.getItem('wt_members')) || [];
+            const storedActivities = JSON.parse(localStorage.getItem('wt_activities')) || [];
+
+            setTasks(storedTasks);
+            setMembers(storedMembers);
+            setActivities(storedActivities);
         } finally {
             setLoading(false);
         }
@@ -110,26 +117,26 @@ export const DataProvider = ({ children }) => {
         });
 
         // Sync to LocalStorage if using placeholder mode
-        if (isPlaceholder && !loading) {
+        if (isLocalMode && !loading) {
             localStorage.setItem('wt_tasks', JSON.stringify(tasks));
         }
-    }, [tasks, loading]);
+    }, [tasks, loading, isLocalMode]);
 
     useEffect(() => {
-        if (isPlaceholder && !loading) {
+        if (isLocalMode && !loading) {
             localStorage.setItem('wt_members', JSON.stringify(members));
         }
-    }, [members, loading]);
+    }, [members, loading, isLocalMode]);
 
     useEffect(() => {
-        if (isPlaceholder && !loading) {
+        if (isLocalMode && !loading) {
             localStorage.setItem('wt_activities', JSON.stringify(activities));
         }
-    }, [activities, loading]);
+    }, [activities, loading, isLocalMode]);
 
     const addTask = async (newTask) => {
         try {
-            if (!isPlaceholder) {
+            if (!isLocalMode) {
                 const { data, error } = await supabase
                     .from('tasks')
                     .insert([{
@@ -170,7 +177,7 @@ export const DataProvider = ({ children }) => {
 
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
-            if (!isPlaceholder) {
+            if (!isLocalMode) {
                 const { error } = await supabase
                     .from('tasks')
                     .update({ status: newStatus })
@@ -193,7 +200,7 @@ export const DataProvider = ({ children }) => {
 
     const addActivity = async (action, item, user) => {
         try {
-            if (!isPlaceholder) {
+            if (!isLocalMode) {
                 const { data, error } = await supabase
                     .from('activities')
                     .insert([{
@@ -228,7 +235,7 @@ export const DataProvider = ({ children }) => {
 
     const addMember = async (newMember) => {
         try {
-            if (!isPlaceholder) {
+            if (!isLocalMode) {
                 const { data, error } = await supabase
                     .from('members')
                     .insert([newMember])
