@@ -18,11 +18,11 @@ const TrackRecord = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Performance Track Record</h2>
-                    <p className="text-[#94a3b8]">Historical analysis of team performance and delivery timelines.</p>
+                    <h2 className="text-2xl font-bold text-foreground">Performance Track Record</h2>
+                    <p className="text-muted">Historical analysis of team performance and delivery timelines.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-3 py-1.5 bg-[#1e2130] text-sm text-white rounded-lg border border-[#2d3142]">Export Report</button>
+                    <button className="px-3 py-1.5 bg-card text-sm text-foreground rounded-lg border border-border">Export Report</button>
                 </div>
             </div>
 
@@ -51,8 +51,8 @@ const TrackRecord = () => {
                         <div className="space-y-6">
                             <div>
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-[#94a3b8]">On-Time Delivery</span>
-                                    <span className="text-white font-bold">96%</span>
+                                    <span className="text-muted">On-Time Delivery</span>
+                                    <span className="text-foreground font-bold">96%</span>
                                 </div>
                                 <div className="h-2 bg-[#2d3142] rounded-full overflow-hidden">
                                     <div className="h-full bg-emerald-500 w-[96%]"></div>
@@ -60,8 +60,8 @@ const TrackRecord = () => {
                             </div>
                             <div>
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-[#94a3b8]">Task Completion Rate</span>
-                                    <span className="text-white font-bold">92%</span>
+                                    <span className="text-muted">Task Completion Rate</span>
+                                    <span className="text-foreground font-bold">92%</span>
                                 </div>
                                 <div className="h-2 bg-[#2d3142] rounded-full overflow-hidden">
                                     <div className="h-full bg-blue-500 w-[92%]"></div>
@@ -69,8 +69,8 @@ const TrackRecord = () => {
                             </div>
                             <div>
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-[#94a3b8]">Client Satisfaction</span>
-                                    <span className="text-white font-bold">4.8/5.0</span>
+                                    <span className="text-muted">Client Satisfaction</span>
+                                    <span className="text-foreground font-bold">4.8/5.0</span>
                                 </div>
                                 <div className="h-2 bg-[#2d3142] rounded-full overflow-hidden">
                                     <div className="h-full bg-purple-500 w-[85%]"></div>
@@ -80,7 +80,7 @@ const TrackRecord = () => {
                     </Card>
 
                     <Card>
-                        <h3 className="text-lg font-semibold text-white mb-4">Risk Analysis</h3>
+                        <h3 className="text-lg font-semibold text-foreground mb-4">Risk Analysis</h3>
                         <div className="flex items-center gap-3 mb-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
                             <AlertTriangle className="text-red-500" size={20} />
                             <div>

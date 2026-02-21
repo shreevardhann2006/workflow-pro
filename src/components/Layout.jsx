@@ -7,7 +7,7 @@ const Layout = ({ children, currentView, onNavigate }) => {
     const isMissingEnvVars = !import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('placeholder');
 
     return (
-        <div className="min-h-screen bg-[#0f111a] text-white font-sans flex flex-col">
+        <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
             {isMissingEnvVars && (
                 <div className="bg-red-500/20 border-b border-red-500/50 text-red-200 px-6 py-4 flex flex-col items-center justify-center text-center z-50">
                     <h3 className="font-bold text-lg mb-1 flex items-center gap-2">

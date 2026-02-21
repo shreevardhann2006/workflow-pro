@@ -18,8 +18,8 @@ const data = [
 const StatCard = ({ title, value, change, icon: Icon, trend }) => (
     <Card className="flex items-center justify-between !p-5">
         <div>
-            <p className="text-[#94a3b8] text-sm font-medium mb-1">{title}</p>
-            <h3 className="text-2xl font-bold text-white mb-1">{value}</h3>
+            <p className="text-muted text-sm font-medium mb-1">{title}</p>
+            <h3 className="text-2xl font-bold text-foreground mb-1">{value}</h3>
             <div className={`flex items-center gap-1 text-xs font-medium ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {trend === 'up' ? '+' : '-'}{change}% from last week
             </div>
@@ -37,11 +37,11 @@ const Dashboard = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Dashboard Overview</h2>
-                    <p className="text-[#94a3b8]">Track your team's performance and workflow progress.</p>
+                    <h2 className="text-2xl font-bold text-foreground">Dashboard Overview</h2>
+                    <p className="text-muted">Track your team's performance and workflow progress.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-3 py-1.5 bg-[#1e2130] text-sm text-white rounded-lg border border-[#2d3142]">This Week</button>
+                    <button className="px-3 py-1.5 bg-card text-sm text-foreground rounded-lg border border-border">This Week</button>
                 </div>
             </div>
 
@@ -97,7 +97,7 @@ const Dashboard = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="text-[#94a3b8] text-sm border-b border-[#2d3142]">
+                            <tr className="text-muted text-sm border-b border-border">
                                 <th className="py-3 font-medium">Action</th>
                                 <th className="py-3 font-medium">Item</th>
                                 <th className="py-3 font-medium">User</th>
@@ -106,13 +106,13 @@ const Dashboard = () => {
                         </thead>
                         <tbody className="text-sm">
                             {activities.map((activity) => (
-                                <tr key={activity.id} className="group hover:bg-[#252836] transition-colors border-b border-[#2d3142]/50 last:border-0">
-                                    <td className="py-3.5 text-white font-medium">
+                                <tr key={activity.id} className="group hover:bg-[#252836] transition-colors border-b border-border/50 last:border-0">
+                                    <td className="py-3.5 text-foreground font-medium">
                                         <Badge variant={activity.action === 'Task Completed' ? 'success' : 'primary'}>{activity.action}</Badge>
                                     </td>
                                     <td className="py-3.5 text-[#cbd5e1]">{activity.item}</td>
-                                    <td className="py-3.5 text-[#94a3b8]">{activity.user}</td>
-                                    <td className="py-3.5 text-[#94a3b8]">{activity.time}</td>
+                                    <td className="py-3.5 text-muted">{activity.user}</td>
+                                    <td className="py-3.5 text-muted">{activity.time}</td>
                                 </tr>
                             ))}
                         </tbody>

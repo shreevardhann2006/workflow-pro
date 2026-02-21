@@ -47,8 +47,8 @@ const TaskBoard = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Task Board</h2>
-                    <p className="text-[#94a3b8]">Manage and track all project tasks in one place.</p>
+                    <h2 className="text-2xl font-bold text-foreground">Task Board</h2>
+                    <p className="text-muted">Manage and track all project tasks in one place.</p>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="secondary" className="!px-3">
@@ -61,7 +61,7 @@ const TaskBoard = () => {
             </div>
 
             {/* Filters & Search */}
-            <Card className="!p-4 bg-[#1e2130]/50 backdrop-blur-sm sticky top-24 z-10">
+            <Card className="!p-4 bg-card/50 backdrop-blur-sm sticky top-24 z-10">
                 <div className="flex flex-col md:flex-row gap-4 justify-between">
                     <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
                         {['All', 'In Progress', 'Review', 'Completed'].map((f) => (
@@ -70,7 +70,7 @@ const TaskBoard = () => {
                                 onClick={() => setFilter(f)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${filter === f
                                     ? 'bg-[#6366f1] text-white shadow-lg shadow-[#6366f1]/20'
-                                    : 'text-[#94a3b8] hover:bg-[#2d3142] hover:text-white'
+                                    : 'text-muted hover:bg-[#2d3142] hover:text-foreground'
                                     }`}
                             >
                                 {f}
@@ -78,11 +78,11 @@ const TaskBoard = () => {
                         ))}
                     </div>
                     <div className="relative w-full md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" size={16} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
                         <input
                             type="text"
                             placeholder="Search tasks..."
-                            className="w-full bg-[#0f111a] border border-[#2d3142] rounded-lg py-2 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-[#6366f1]"
+                            className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:border-[#6366f1]"
                         />
                     </div>
                 </div>
@@ -91,15 +91,15 @@ const TaskBoard = () => {
             {/* Task List */}
             <div className="space-y-4">
                 {filteredTasks.map((task) => (
-                    <div key={task.id} className="bg-[#1e2130] rounded-xl border border-[#2d3142] p-4 hover:border-[#6366f1]/50 transition-all group">
+                    <div key={task.id} className="bg-card rounded-xl border border-border p-4 hover:border-[#6366f1]/50 transition-all group">
                         <div className="flex items-center justify-between">
                             <div className="flex items-start gap-4">
-                                <div className={`mt-1 p-2 rounded-lg ${task.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-[#2d3142] text-[#94a3b8]'}`}>
+                                <div className={`mt-1 p-2 rounded-lg ${task.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-[#2d3142] text-muted'}`}>
                                     {task.status === 'Completed' ? <CheckCircle2 size={20} /> : <Clock size={20} />}
                                 </div>
                                 <div>
-                                    <h3 className="text-white font-medium text-lg leading-tight mb-1">{task.title}</h3>
-                                    <div className="flex items-center gap-3 text-sm text-[#94a3b8]">
+                                    <h3 className="text-foreground font-medium text-lg leading-tight mb-1">{task.title}</h3>
+                                    <div className="flex items-center gap-3 text-sm text-muted">
                                         <span className="flex items-center gap-1.5">
                                             <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-[10px] font-bold">
                                                 {task.assignee.charAt(0)}
@@ -119,7 +119,7 @@ const TaskBoard = () => {
                                 <div onClick={() => handleStatusCycle(task)} className="cursor-pointer hover:opacity-80 transition-opacity" title="Click to cycle status">
                                     <Badge variant={getStatusColor(task.status)}>{task.status}</Badge>
                                 </div>
-                                <button className="text-[#94a3b8] hover:text-white p-2 hover:bg-[#2d3142] rounded-lg transition-colors">
+                                <button className="text-muted hover:text-foreground p-2 hover:bg-[#2d3142] rounded-lg transition-colors">
                                     <MoreVertical size={18} />
                                 </button>
                             </div>
