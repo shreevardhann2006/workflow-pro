@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext';
 import { X, Calendar, AlignLeft, Flag, Target } from 'lucide-react';
 
 const Modal = () => {
-    const { activeModal, closeModal, addTask, addMember } = useData();
+    const { activeModal, closeModal, addTask, addMember, editTask, editMember } = useData();
 
     // Form States
     const [titleStr, setTitleStr] = useState('');
@@ -15,6 +15,36 @@ const Modal = () => {
     // Member Form States
     const [memberEmail, setMemberEmail] = useState('');
     const [memberRole, setMemberRole] = useState('Developer');
+
+    // Parse activeModal which can now be a string 'task' or an array ['edit_task', payloadObj]
+    const modalType = Array.isArray(activeModal) ? activeModal[0] : activeModal;
+    const modalPayload = Array.isArray(activeModal) ? activeModal[1] : null;
+
+    React.useEffect(() => {
+        if (!activeModal) {
+            // Reset forms on close
+            setTitleStr('');
+            setAssignee('You');
+            setDueDate('');
+            setPriority('Medium');
+            setType('Frontend');
+            setMemberEmail('');
+            setMemberRole('Developer');
+            return;
+        }
+
+        if (modalType === 'edit_task' && modalPayload) {
+            setTitleStr(modalPayload.title);
+            setAssignee(modalPayload.assignee);
+            setDueDate(modalPayload.due === 'TBD' ? '' : modalPayload.due);
+            setPriority(modalPayload.priority);
+            setType(modalPayload.type);
+        } else if (modalType === 'edit_member' && modalPayload) {
+            setTitleStr(modalPayload.name);
+            setMemberEmail(modalPayload.email);
+            setMemberRole(modalPayload.role);
+        }
+    }, [activeModal, modalType, modalPayload]);
 
     const handleCreateTask = () => {
         if (!titleStr.trim()) return;
@@ -53,8 +83,29 @@ const Modal = () => {
             email: memberEmail,
             status: 'Active'
         });
-        setTitleStr('');
-        setMemberEmail('');
+        closeModal();
+    };
+
+    const handleEditTaskAct = () => {
+        if (!titleStr.trim() || !modalPayload) return;
+        editTask(modalPayload.id, {
+            title: titleStr,
+            assignee: assignee,
+            due_date: dueDate || 'TBD', // DB format
+            due: dueDate || 'TBD', // UI format
+            priority: priority,
+            type: type
+        });
+        closeModal();
+    };
+
+    const handleEditMemberAct = () => {
+        if (!titleStr.trim() || !memberEmail.trim() || !modalPayload) return;
+        editMember(modalPayload.id, {
+            name: titleStr,
+            role: memberRole,
+            email: memberEmail
+        });
         closeModal();
     };
 
@@ -63,8 +114,8 @@ const Modal = () => {
     let title = '';
     let content = null;
 
-    if (activeModal === 'task') {
-        title = 'New Task';
+    if (modalType === 'task' || modalType === 'edit_task') {
+        title = modalType === 'edit_task' ? 'Edit Task' : 'New Task';
         content = (
             <div className="space-y-4 text-foreground">
                 <div>
@@ -126,7 +177,7 @@ const Modal = () => {
                 </div>
             </div>
         );
-    } else if (activeModal === 'project') {
+    } else if (modalType === 'project') {
         title = 'New Project';
         content = (
             <div className="space-y-4 text-foreground">
@@ -146,7 +197,7 @@ const Modal = () => {
                 </p>
             </div>
         );
-    } else if (activeModal === 'notification') {
+    } else if (modalType === 'notification') {
         title = 'Notifications';
         content = (
             <div className="space-y-3">
@@ -160,8 +211,8 @@ const Modal = () => {
                 </div>
             </div>
         );
-    } else if (activeModal === 'member') {
-        title = 'Add Team Member';
+    } else if (modalType === 'member' || modalType === 'edit_member') {
+        title = modalType === 'edit_member' ? 'Edit Team Member' : 'Add Team Member';
         content = (
             <div className="space-y-4 text-foreground">
                 <div>
@@ -222,13 +273,19 @@ const Modal = () => {
                     <button onClick={closeModal} className="px-4 py-2 rounded-xl text-sm font-medium text-muted hover:text-foreground hover:bg-[#2d3142] transition-colors">
                         Cancel
                     </button>
-                    {(activeModal === 'task' || activeModal === 'project' || activeModal === 'member') && (
+                    {(modalType === 'task' || modalType === 'project' || modalType === 'member' || modalType === 'edit_task' || modalType === 'edit_member') && (
                         <button
-                            onClick={activeModal === 'task' ? handleCreateTask : activeModal === 'project' ? handleCreateProject : handleCreateMember}
-                            disabled={!titleStr.trim() || (activeModal === 'member' && !memberEmail.trim())}
+                            onClick={
+                                modalType === 'task' ? handleCreateTask :
+                                    modalType === 'project' ? handleCreateProject :
+                                        modalType === 'edit_task' ? handleEditTaskAct :
+                                            modalType === 'edit_member' ? handleEditMemberAct :
+                                                handleCreateMember
+                            }
+                            disabled={!titleStr.trim() || ((modalType === 'member' || modalType === 'edit_member') && !memberEmail.trim())}
                             className="px-4 py-2 rounded-xl text-sm font-medium bg-[#6366f1] text-white hover:bg-[#4f46e5] disabled:bg-[#6366f1]/50 disabled:cursor-not-allowed shadow-lg shadow-[#6366f1]/25 transition-all"
                         >
-                            Create {activeModal === 'task' ? 'Task' : activeModal === 'project' ? 'Project' : 'Member'}
+                            {modalType.includes('edit') ? 'Save Changes' : `Create ${modalType === 'task' ? 'Task' : modalType === 'project' ? 'Project' : 'Member'}`}
                         </button>
                     )}
                 </div>

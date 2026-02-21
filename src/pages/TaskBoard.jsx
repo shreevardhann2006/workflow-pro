@@ -7,8 +7,9 @@ import Input from '../components/Input';
 import { Plus, Filter, Search, MoreVertical, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const TaskBoard = () => {
-    const { tasks, updateTaskStatus, openModal } = useData();
+    const { tasks, updateTaskStatus, openModal, deleteTask } = useData();
     const [filter, setFilter] = useState('All');
+    const [activeDropdown, setActiveDropdown] = useState(null);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -39,6 +40,16 @@ const TaskBoard = () => {
         const currentIndex = statuses.indexOf(task.status);
         const nextStatus = statuses[(currentIndex + 1) % statuses.length];
         updateTaskStatus(task.id, nextStatus);
+    };
+
+    const handleDelete = (taskId) => {
+        deleteTask(taskId);
+        setActiveDropdown(null);
+    };
+
+    const handleEdit = (task) => {
+        openModal('edit_task', task);
+        setActiveDropdown(null);
     };
 
     const filteredTasks = filter === 'All' ? tasks : tasks.filter(t => t.status === filter);
@@ -112,16 +123,36 @@ const TaskBoard = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 relative">
                                 <div className={`text-xs font-bold uppercase tracking-wider ${getPriorityColor(task.priority)}`}>
                                     {task.priority}
                                 </div>
                                 <div onClick={() => handleStatusCycle(task)} className="cursor-pointer hover:opacity-80 transition-opacity" title="Click to cycle status">
                                     <Badge variant={getStatusColor(task.status)}>{task.status}</Badge>
                                 </div>
-                                <button className="text-muted hover:text-foreground p-2 hover:bg-[#2d3142] rounded-lg transition-colors">
+                                <button
+                                    onClick={() => setActiveDropdown(activeDropdown === task.id ? null : task.id)}
+                                    className="text-muted hover:text-foreground p-2 hover:bg-[#2d3142] rounded-lg transition-colors"
+                                >
                                     <MoreVertical size={18} />
                                 </button>
+
+                                {activeDropdown === task.id && (
+                                    <div className="absolute right-0 top-10 w-36 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
+                                        <button
+                                            onClick={() => handleEdit(task)}
+                                            className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-[#2d3142] transition-colors"
+                                        >
+                                            Edit Task
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(task.id)}
+                                            className="w-full text-left px-4 py-2 text-sm text-rose-500 hover:bg-rose-500/10 transition-colors"
+                                        >
+                                            Delete Task
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

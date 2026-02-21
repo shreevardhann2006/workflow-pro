@@ -13,7 +13,9 @@ export const DataProvider = ({ children }) => {
     const [activeModal, setActiveModal] = useState(null);
     const [isLocalMode, setIsLocalMode] = useState(envIsPlaceholder);
 
-    const openModal = (modalName) => setActiveModal(modalName);
+    const openModal = (modalName, payload = null) => {
+        setActiveModal(payload ? [modalName, payload] : modalName);
+    };
     const closeModal = () => setActiveModal(null);
 
     // Derived State
@@ -175,6 +177,46 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    const editTask = async (taskId, updatedData) => {
+        try {
+            if (!isLocalMode) {
+                const { error } = await supabase
+                    .from('tasks')
+                    .update(updatedData)
+                    .eq('id', taskId);
+
+                if (error) throw error;
+            }
+
+            const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, ...updatedData } : t);
+            setTasks(updatedTasks);
+            addActivity('Task Updated', updatedData.title || 'A task', 'You');
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
+    };
+
+    const deleteTask = async (taskId) => {
+        try {
+            if (!isLocalMode) {
+                const { error } = await supabase
+                    .from('tasks')
+                    .delete()
+                    .eq('id', taskId);
+
+                if (error) throw error;
+            }
+
+            const taskToDelete = tasks.find(t => t.id === taskId);
+            setTasks(tasks.filter(t => t.id !== taskId));
+            if (taskToDelete) {
+                addActivity('Task Deleted', taskToDelete.title, 'You');
+            }
+        } catch (error) {
+            console.error('Error deleting task:', error);
+        }
+    };
+
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
             if (!isLocalMode) {
@@ -261,6 +303,46 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    const editMember = async (memberId, updatedData) => {
+        try {
+            if (!isLocalMode) {
+                const { error } = await supabase
+                    .from('members')
+                    .update(updatedData)
+                    .eq('id', memberId);
+
+                if (error) throw error;
+            }
+
+            const updatedMembers = members.map(m => m.id === memberId ? { ...m, ...updatedData } : m);
+            setMembers(updatedMembers);
+            addActivity('Member Updated', updatedData.name || 'A member', 'Admin');
+        } catch (error) {
+            console.error('Error updating member:', error);
+        }
+    };
+
+    const deleteMember = async (memberId) => {
+        try {
+            if (!isLocalMode) {
+                const { error } = await supabase
+                    .from('members')
+                    .delete()
+                    .eq('id', memberId);
+
+                if (error) throw error;
+            }
+
+            const memberToDelete = members.find(m => m.id === memberId);
+            setMembers(members.filter(m => m.id !== memberId));
+            if (memberToDelete) {
+                addActivity('Member Deleted', memberToDelete.name, 'Admin');
+            }
+        } catch (error) {
+            console.error('Error deleting member:', error);
+        }
+    };
+
     return (
         <DataContext.Provider value={{
             tasks,
@@ -271,8 +353,12 @@ export const DataProvider = ({ children }) => {
             openModal,
             closeModal,
             addTask,
+            editTask,
+            deleteTask,
             updateTaskStatus,
-            addMember
+            addMember,
+            editMember,
+            deleteMember
         }}>
             {children}
         </DataContext.Provider>
