@@ -7,6 +7,7 @@ import TaskBoard from './pages/TaskBoard';
 import TrackRecord from './pages/TrackRecord';
 import Goals from './pages/Goals';
 import Team from './pages/Team';
+import Settings from './pages/Settings';
 import Modal from './components/Modal';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       case 'Reports': return <TrackRecord />;
       case 'Goals & Targets': return <Goals />;
       case 'Team': return <Team />;
+      case 'Settings': return <Settings />;
       default: return <Dashboard />;
     }
   };
