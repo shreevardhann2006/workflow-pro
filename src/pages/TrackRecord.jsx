@@ -14,6 +14,23 @@ const data = [
 ];
 
 const TrackRecord = () => {
+    const handleExport = () => {
+        let csv = 'Month,Efficiency Score,Tasks Delivered,Delayed\n';
+        data.forEach(row => {
+            csv += `${row.name},${row.performance},${row.tasks},${row.delayed}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'performance_report.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -22,7 +39,12 @@ const TrackRecord = () => {
                     <p className="text-muted">Historical analysis of team performance and delivery timelines.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-3 py-1.5 bg-card text-sm text-foreground rounded-lg border border-border">Export Report</button>
+                    <button
+                        onClick={handleExport}
+                        className="px-3 py-1.5 bg-card text-sm text-foreground rounded-lg border border-border hover:bg-[#2d3142] transition-colors hover:text-white"
+                    >
+                        Export Report
+                    </button>
                 </div>
             </div>
 
