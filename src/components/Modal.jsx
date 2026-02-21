@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext';
 import { X, Calendar, AlignLeft, Flag, Target } from 'lucide-react';
 
 const Modal = () => {
-    const { activeModal, closeModal, addTask } = useData();
+    const { activeModal, closeModal, addTask, addMember } = useData();
 
     // Form States
     const [titleStr, setTitleStr] = useState('');
