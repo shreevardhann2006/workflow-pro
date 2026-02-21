@@ -7,6 +7,7 @@ import TaskBoard from './pages/TaskBoard';
 import TrackRecord from './pages/TrackRecord';
 import Goals from './pages/Goals';
 import Team from './pages/Team';
+import Modal from './components/Modal';
 
 function App() {
   const [currentView, setCurrentView] = useState('Dashboard');
@@ -27,6 +28,7 @@ function App() {
       <Layout currentView={currentView} onNavigate={setCurrentView}>
         {renderView()}
       </Layout>
+      <Modal />
     </DataProvider>
   );
 }

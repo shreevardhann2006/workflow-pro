@@ -1,8 +1,10 @@
 import React from 'react';
 import { Search, Bell } from 'lucide-react';
 import Button from './Button';
+import { useData } from '../context/DataContext';
 
 const Header = () => {
+    const { openModal } = useData();
     return (
         <header className="h-20 border-b border-[#2d3142] bg-[#0f111a]/80 backdrop-blur-md sticky top-0 z-20 px-8 flex items-center justify-between">
             <div className="flex items-center gap-4 w-96">
@@ -17,11 +19,14 @@ const Header = () => {
             </div>
 
             <div className="flex items-center gap-4">
-                <button className="relative p-2.5 rounded-xl hover:bg-[#1e2130] text-[#94a3b8] hover:text-white transition-colors">
+                <button
+                    onClick={() => openModal('notification')}
+                    className="relative p-2.5 rounded-xl hover:bg-[#1e2130] text-[#94a3b8] hover:text-white transition-colors"
+                >
                     <Bell size={20} />
                     <span className="absolute top-2 right-2.5 w-2 h-2 bg-[#ef4444] rounded-full border-2 border-[#0f111a]"></span>
                 </button>
-                <Button variant="primary" className="!py-2 !px-4 !text-sm">
+                <Button variant="primary" className="!py-2 !px-4 !text-sm" onClick={() => openModal('project')}>
                     + New Project
                 </Button>
             </div>

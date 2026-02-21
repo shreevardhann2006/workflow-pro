@@ -10,6 +10,10 @@ export const DataProvider = ({ children }) => {
     const [members, setMembers] = useState([]);
     const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeModal, setActiveModal] = useState(null);
+
+    const openModal = (modalName) => setActiveModal(modalName);
+    const closeModal = () => setActiveModal(null);
 
     // Derived State
     const [stats, setStats] = useState({
@@ -178,6 +182,9 @@ export const DataProvider = ({ children }) => {
             members,
             activities,
             stats,
+            activeModal,
+            openModal,
+            closeModal,
             addTask,
             updateTaskStatus
         }}>

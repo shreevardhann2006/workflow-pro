@@ -7,7 +7,7 @@ import Input from '../components/Input';
 import { Plus, Filter, Search, MoreVertical, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const TaskBoard = () => {
-    const { tasks, addTask, updateTaskStatus } = useData();
+    const { tasks, updateTaskStatus, openModal } = useData();
     const [filter, setFilter] = useState('All');
 
     const getStatusColor = (status) => {
@@ -31,21 +31,7 @@ const TaskBoard = () => {
     };
 
     const handleAddTask = () => {
-        const newTasks = [
-            { title: 'Database Optimization', type: 'Backend' },
-            { title: 'New Landing Page', type: 'Frontend' },
-            { title: 'User Research', type: 'UX' }
-        ];
-        const randomTask = newTasks[Math.floor(Math.random() * newTasks.length)];
-
-        addTask({
-            title: randomTask.title,
-            assignee: 'You',
-            due: 'Next Week',
-            status: 'Pending',
-            priority: 'Medium',
-            type: randomTask.type
-        });
+        openModal('task');
     };
 
     const handleStatusCycle = (task) => {
