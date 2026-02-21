@@ -12,6 +12,10 @@ const Modal = () => {
     const [priority, setPriority] = useState('Medium');
     const [type, setType] = useState('Frontend');
 
+    // Member Form States
+    const [memberEmail, setMemberEmail] = useState('');
+    const [memberRole, setMemberRole] = useState('Developer');
+
     const handleCreateTask = () => {
         if (!titleStr.trim()) return;
         addTask({
@@ -38,6 +42,19 @@ const Modal = () => {
             type: titleStr
         });
         setTitleStr('');
+        closeModal();
+    };
+
+    const handleCreateMember = () => {
+        if (!titleStr.trim() || !memberEmail.trim()) return;
+        addMember({
+            name: titleStr,
+            role: memberRole,
+            email: memberEmail,
+            status: 'Active'
+        });
+        setTitleStr('');
+        setMemberEmail('');
         closeModal();
     };
 
@@ -143,6 +160,48 @@ const Modal = () => {
                 </div>
             </div>
         );
+    } else if (activeModal === 'member') {
+        title = 'Add Team Member';
+        content = (
+            <div className="space-y-4 text-foreground">
+                <div>
+                    <label className="text-xs text-muted font-semibold uppercase tracking-wider mb-1 block">Full Name</label>
+                    <input
+                        type="text"
+                        value={titleStr}
+                        onChange={(e) => setTitleStr(e.target.value)}
+                        placeholder="e.g., Jane Doe"
+                        className="w-full bg-background border border-border rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-[#6366f1] transition-colors"
+                        autoFocus
+                    />
+                </div>
+                <div>
+                    <label className="text-xs text-muted font-semibold uppercase tracking-wider mb-1 block">Email Address</label>
+                    <input
+                        type="email"
+                        value={memberEmail}
+                        onChange={(e) => setMemberEmail(e.target.value)}
+                        placeholder="e.g., jane@example.com"
+                        className="w-full bg-background border border-border rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-[#6366f1] transition-colors"
+                    />
+                </div>
+                <div>
+                    <label className="text-xs text-muted font-semibold uppercase tracking-wider mb-1 block">Role</label>
+                    <div className="relative">
+                        <select
+                            value={memberRole}
+                            onChange={(e) => setMemberRole(e.target.value)}
+                            className="w-full bg-background border border-border rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-[#6366f1] transition-colors appearance-none cursor-pointer text-foreground"
+                        >
+                            <option className="bg-card">Developer</option>
+                            <option className="bg-card">Designer</option>
+                            <option className="bg-card">Project Manager</option>
+                            <option className="bg-card">Marketing</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -163,13 +222,13 @@ const Modal = () => {
                     <button onClick={closeModal} className="px-4 py-2 rounded-xl text-sm font-medium text-muted hover:text-foreground hover:bg-[#2d3142] transition-colors">
                         Cancel
                     </button>
-                    {(activeModal === 'task' || activeModal === 'project') && (
+                    {(activeModal === 'task' || activeModal === 'project' || activeModal === 'member') && (
                         <button
-                            onClick={activeModal === 'task' ? handleCreateTask : handleCreateProject}
+                            onClick={activeModal === 'task' ? handleCreateTask : activeModal === 'project' ? handleCreateProject : handleCreateMember}
                             disabled={!titleStr.trim()}
                             className="px-4 py-2 rounded-xl text-sm font-medium bg-[#6366f1] text-white hover:bg-[#4f46e5] disabled:bg-[#6366f1]/50 disabled:cursor-not-allowed shadow-lg shadow-[#6366f1]/25 transition-all"
                         >
-                            Create {activeModal === 'task' ? 'Task' : 'Project'}
+                            Create {activeModal === 'task' ? 'Task' : activeModal === 'project' ? 'Project' : 'Member'}
                         </button>
                     )}
                 </div>

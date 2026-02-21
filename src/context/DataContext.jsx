@@ -107,25 +107,41 @@ export const DataProvider = ({ children }) => {
     }, [tasks]);
 
     const addTask = async (newTask) => {
+        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
-            const { data, error } = await supabase
-                .from('tasks')
-                .insert([{
+            if (!isPlaceholder) {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .insert([{
+                        title: newTask.title,
+                        assignee: newTask.assignee,
+                        due_date: newTask.due,
+                        status: 'Pending',
+                        priority: newTask.priority,
+                        type: newTask.type
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                if (data) {
+                    const createdTask = { ...data[0], due: data[0].due_date };
+                    setTasks([createdTask, ...tasks]);
+                    addActivity('Task Created', createdTask.title, 'You');
+                }
+            } else {
+                // Fallback to local memory only
+                const localTask = {
+                    id: Date.now(),
                     title: newTask.title,
                     assignee: newTask.assignee,
-                    due_date: newTask.due,
+                    due: newTask.due,
                     status: 'Pending',
                     priority: newTask.priority,
                     type: newTask.type
-                }])
-                .select();
-
-            if (error) throw error;
-
-            if (data) {
-                const createdTask = { ...data[0], due: data[0].due_date };
-                setTasks([createdTask, ...tasks]);
-                addActivity('Task Created', createdTask.title, 'You');
+                };
+                setTasks([localTask, ...tasks]);
+                addActivity('Task Created', localTask.title, 'You');
             }
         } catch (error) {
             console.error('Error adding task:', error);
@@ -133,13 +149,16 @@ export const DataProvider = ({ children }) => {
     };
 
     const updateTaskStatus = async (taskId, newStatus) => {
+        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
-            const { error } = await supabase
-                .from('tasks')
-                .update({ status: newStatus })
-                .eq('id', taskId);
+            if (!isPlaceholder) {
+                const { error } = await supabase
+                    .from('tasks')
+                    .update({ status: newStatus })
+                    .eq('id', taskId);
 
-            if (error) throw error;
+                if (error) throw error;
+            }
 
             const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t);
             setTasks(updatedTasks);
@@ -154,25 +173,67 @@ export const DataProvider = ({ children }) => {
     };
 
     const addActivity = async (action, item, user) => {
+        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
-            const { data, error } = await supabase
-                .from('activities')
-                .insert([{
+            if (!isPlaceholder) {
+                const { data, error } = await supabase
+                    .from('activities')
+                    .insert([{
+                        action,
+                        item,
+                        user_name: user,
+                        time_text: 'Just now'
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                if (data) {
+                    const newActivity = { ...data[0], user: data[0].user_name, time: data[0].time_text };
+                    setActivities([newActivity, ...activities.slice(0, 9)]);
+                }
+            } else {
+                // Local fallback
+                const localActivity = {
+                    id: Date.now(),
                     action,
                     item,
-                    user_name: user,
-                    time_text: 'Just now'
-                }])
-                .select();
-
-            if (error) throw error;
-
-            if (data) {
-                const newActivity = { ...data[0], user: data[0].user_name, time: data[0].time_text };
-                setActivities([newActivity, ...activities.slice(0, 9)]);
+                    user,
+                    time: 'Just now'
+                };
+                setActivities([localActivity, ...activities.slice(0, 9)]);
             }
         } catch (error) {
             console.error('Error adding activity:', error);
+        }
+    };
+
+    const addMember = async (newMember) => {
+        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
+        try {
+            if (!isPlaceholder) {
+                const { data, error } = await supabase
+                    .from('members')
+                    .insert([newMember])
+                    .select();
+
+                if (error) throw error;
+
+                if (data) {
+                    setMembers([...members, data[0]]);
+                    addActivity('Member Added', data[0].name, 'Admin');
+                }
+            } else {
+                // Local fallback
+                const localMember = {
+                    id: Date.now(),
+                    ...newMember
+                };
+                setMembers([...members, localMember]);
+                addActivity('Member Added', localMember.name, 'Admin');
+            }
+        } catch (error) {
+            console.error('Error adding member:', error);
         }
     };
 
@@ -186,7 +247,8 @@ export const DataProvider = ({ children }) => {
             openModal,
             closeModal,
             addTask,
-            updateTaskStatus
+            updateTaskStatus,
+            addMember
         }}>
             {children}
         </DataContext.Provider>

@@ -5,7 +5,7 @@ import Badge from '../components/Badge';
 import { Mail, Phone, MoreHorizontal } from 'lucide-react';
 
 const Team = () => {
-    const { members } = useData();
+    const { members, openModal } = useData();
 
     return (
         <div className="space-y-6">
@@ -14,7 +14,10 @@ const Team = () => {
                     <h2 className="text-2xl font-bold text-foreground">Team Members</h2>
                     <p className="text-muted">Manage user roles and access.</p>
                 </div>
-                <button className="px-4 py-2 bg-[#6366f1] text-white rounded-lg hover:bg-[#4f46e5] transition-colors font-medium">
+                <button
+                    onClick={() => openModal('member')}
+                    className="px-4 py-2 bg-[#6366f1] text-white rounded-lg hover:bg-[#4f46e5] transition-colors font-medium"
+                >
                     + Add Member
                 </button>
             </div>
