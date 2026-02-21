@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase, isPlaceholder } from '../supabaseClient';
 
 const DataContext = createContext();
 
@@ -33,7 +33,7 @@ export const DataProvider = ({ children }) => {
             setLoading(true);
 
             // Check if we are using the placeholder client
-            if (supabase.supabaseUrl === 'https://placeholder.supabase.co') {
+            if (isPlaceholder) {
                 console.warn('Supabase URL is missing. Using local empty state. Please configure your .env or Vercel Environment Variables.');
                 setTasks([]);
                 setMembers([]);
@@ -107,7 +107,6 @@ export const DataProvider = ({ children }) => {
     }, [tasks]);
 
     const addTask = async (newTask) => {
-        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
             if (!isPlaceholder) {
                 const { data, error } = await supabase
@@ -149,7 +148,6 @@ export const DataProvider = ({ children }) => {
     };
 
     const updateTaskStatus = async (taskId, newStatus) => {
-        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
             if (!isPlaceholder) {
                 const { error } = await supabase
@@ -173,7 +171,6 @@ export const DataProvider = ({ children }) => {
     };
 
     const addActivity = async (action, item, user) => {
-        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
             if (!isPlaceholder) {
                 const { data, error } = await supabase
@@ -209,7 +206,6 @@ export const DataProvider = ({ children }) => {
     };
 
     const addMember = async (newMember) => {
-        const isPlaceholder = supabase.supabaseUrl === 'https://placeholder.supabase.co';
         try {
             if (!isPlaceholder) {
                 const { data, error } = await supabase
